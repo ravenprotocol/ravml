@@ -4,7 +4,7 @@ import logging.handlers
 
 import numpy as np
 import statsmodels.api as sm  # for finding the p-value
-from ravop import globals as g
+from ravcom import globals as g
 from ravop.core import Graph, Tensor, Scalar
 from sklearn.metrics import accuracy_score, recall_score
 from sklearn.utils import shuffle

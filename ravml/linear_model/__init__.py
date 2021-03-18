@@ -3,7 +3,7 @@ import logging.handlers
 
 import ravop.core as R
 from ravcom import ravcom
-from ravop import globals as g
+from ravcom import globals as g
 from ravop.core import Tensor, Graph
 
 from ravml import metrics
