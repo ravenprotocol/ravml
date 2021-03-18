@@ -7,6 +7,7 @@ from ravcom import globals as g
 from ravop.core import Graph, Tensor, Scalar
 from ravml import metrics
 import ravop.core as R
+from .config import RAVML_LOG_FILE
 
 
 class LinearRegression(Graph):
@@ -32,7 +33,7 @@ class LinearRegression(Graph):
         self.logger.setLevel(logging.DEBUG)
 
         # Add the log message handler to the logger
-        handler = logging.handlers.RotatingFileHandler(g.ravop_log_file)
+        handler = logging.handlers.RotatingFileHandler(RAVML_LOG_FILE)
 
         self.logger.addHandler(handler)
 
