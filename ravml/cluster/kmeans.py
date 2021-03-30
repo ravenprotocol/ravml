@@ -44,9 +44,9 @@ class Kmeans(object):
 
     def update_centroids(self):
 
-        gather = self.points.gather(R.find_indices(self.label, values=[0])).mean(axis=1)
+        gather = self.points.gather(R.find_indices(self.label, Tensor([0]))).mean(axis=1)
         for i in range(1, self.k):
-            ind = R.find_indices(self.label, values=[i])
+            ind = R.find_indices(self.label, Tensor([i]))
             gat = R.gather(self.points, ind).mean(axis=1)
             gather = R.concat(gather, gat)
         self.centroids= gather.reshape(shape=[self.k, len(self.points.output[0])])
@@ -90,13 +90,13 @@ class MiniBatchKmeans(object):
         while label.status!= 'computed':
             pass
         if 0 in label.output :
-            gather=R.gather(points,R.find_indices(label,values=[0])).mean(axis=1)
+            gather=R.gather(points,R.find_indices(label,Tensor([0]))).mean(axis=1)
         else:
             gather=R.gather(self.centroids, Tensor([0])).expand_dims(axis=0)
 
         for i in range(1,self.k):
             if i in label.output:
-                ind = R.find_indices(label,values=[i])
+                ind = R.find_indices(label,Tensor([i]))
                 gat = R.gather(points,ind).mean(axis=1)
             else:
                 gat = R.gather(self.centroids, Tensor([i])).expand_dims(axis=0)
