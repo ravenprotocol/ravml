@@ -1,30 +1,11 @@
 import ravop.core as R
 from ravop.core import Tensor,Scalar,Graph
-from ravcom.utils import inform_server
-import numpy as np
-def eucledian_distance(self, X, Y):
-    return R.square_root(((R.sub(X, Y)).pow(Scalar(2))).sum(axis=0))
 
-'''
-            Regressor
-'''
-class KNN_regressor():
 
-    def __init__(self):
-        self.k=None
-        self.X=None
-        self.y=None
-        self.weights=None
-        pass
-
-    def fit(self,X_Train,Y_train):
-        self.X=Tensor(X_Train)
-        self.Y=Tensor(Y_train)
-        pass
 
 
 '''
-                    classifier
+                    KNN classifier
 '''
 
 
