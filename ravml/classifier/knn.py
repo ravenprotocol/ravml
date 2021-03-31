@@ -1,30 +1,11 @@
 import ravop.core as R
 from ravop.core import Tensor,Scalar,Graph
-from ravcom.utils import inform_server
-import numpy as np
-def eucledian_distance(self, X, Y):
-    return R.square_root(((R.sub(X, Y)).pow(Scalar(2))).sum(axis=0))
 
-'''
-            Regressor
-'''
-class KNN_regressor():
 
-    def __init__(self):
-        self.k=None
-        self.X=None
-        self.y=None
-        self.weights=None
-        pass
-
-    def fit(self,X_Train,Y_train):
-        self.X=Tensor(X_Train)
-        self.Y=Tensor(Y_train)
-        pass
 
 
 '''
-                    classifier
+                    KNN classifier
 '''
 
 
@@ -50,28 +31,28 @@ class KNN_classifier():
         sl= fe.foreach(operation='slice',begin=0,size=self.k)
         while sl.status != "computed":
             pass
-        inform_server()
-        #print(sl)
-        li = sl.output.tolist()
+
+        print(sl)
+
         label=R.Tensor([])
         for i in range(self.n_q):
             row=R.gather(d_list,Tensor([i])).reshape(shape=[self.n])
-            while row.status!='computed':
+
+            values=sl.gather(Tensor([i])).reshape(shape=[self.k])
+            while values.status!='computed':
                 pass
-            inform_server()
-            print(row)
-            ind=R.find_indices(row,values=li[i])
+            print(values,row)
+            ind=R.find_indices(row,values)
 
             while ind.status!='computed':
                 pass
 
-            inform_server()
             ind=ind.foreach(operation='slice',begin=0,size=1)
             y_neighbours= R.gather(self.Y,ind).reshape(shape=[self.k])
             while y_neighbours.status!='computed':
                 pass
             label=label.concat(R.mode(y_neighbours))
-            inform_server()
+
         while label.status!='computed':
             pass
         return label
