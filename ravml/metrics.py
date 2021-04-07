@@ -19,7 +19,6 @@ def r2_score(y_true, y_pred):
     SS_res = R.sum(R.square(R.sub(y_pred, y_true)), name="ss_res")
     SS_tot = R.sum(R.square(R.sub(y_true, R.mean(y_true))), name="ss_tot")
 
-
     return R.sub(scalar1, R.div(SS_res, SS_tot), name="r2_score")
 
 
@@ -84,17 +83,15 @@ def r2_score(y_true, y_pred):
 #
 #
 #
-#
-# def accuracy(y_true, y_pred):
-#
-#   if not isinstance(y_true, R.Tensor):
-#       y_true = R.Tensor(y_true)
-#   if not isinstance(y_pred, R.Tensor):
-#       y_pred = R.Tensor(y_pred)
-#
-#   accuracy = R.div(R.sum((y_pred == y_val)),y_pred.shape[0])
-#   return accuracy
-#
+
+def accuracy(y_true, y_pred):
+    if not isinstance(y_true, R.Tensor):
+        y_true = R.Tensor(y_true)
+    if not isinstance(y_pred, R.Tensor):
+        y_pred = R.Tensor(y_pred)
+
+    return R.div(R.sum((y_pred == y_true)), y_pred.shape[0])
+
 #
 # def out_pred(y_true, y_pred, per_label=False, mode):
 #
