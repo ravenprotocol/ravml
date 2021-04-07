@@ -86,9 +86,11 @@ def r2_score(y_true, y_pred):
 
 def accuracy(y_true, y_pred):
     if not isinstance(y_true, R.Tensor):
-        y_true = R.Tensor(y_true)
+        if not isinstance(y_true, R.Op):
+            y_true = R.Tensor(y_true)
     if not isinstance(y_pred, R.Tensor):
-        y_pred = R.Tensor(y_pred)
+        if not isinstance(y_pred, R.Op):
+            y_pred = R.Tensor(y_pred)
 
     return R.div(R.sum((y_pred == y_true)), y_pred.shape[0])
 
