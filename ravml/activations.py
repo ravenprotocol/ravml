@@ -21,3 +21,8 @@ def tanh(x):
     Tanh Activation Function
     """
     return R.div(R.sub(R.exp(x), R.exp(R.mul(R.minus_one(), x))), R.add(R.exp(x), R.exp(R.mul(R.minus_one(), x))))
+def relu(x):
+    """
+    Relu Activation Function
+    """
+    return x if x >0 else 0
