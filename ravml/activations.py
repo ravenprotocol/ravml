@@ -25,4 +25,4 @@ def relu(x):
     """
     Relu Activation Function
     """
-    return x if x >0 else 0
+    return R.max(x,0)
