@@ -19,9 +19,39 @@ def r2_score(y_true, y_pred):
     SS_res = R.sum(R.square(R.sub(y_pred, y_true)), name="ss_res")
     SS_tot = R.sum(R.square(R.sub(y_true, R.mean(y_true))), name="ss_tot")
 
-
     return R.sub(scalar1, R.div(SS_res, SS_tot), name="r2_score")
 
+
+def get_TP_TN_FN_FP(true_labels, pred_labels):
+    li = [None, None, None, None]
+    var = R.equal(true_labels, pred_labels)
+    TP = R.logical_and(true_labels, pred_labels)
+    TN = R.logical_not(R.logical_or(true_labels, pred_labels))
+    FN = R.logical_not(R.logical_or(pred_labels, var))
+    FP = R.logical_and(pred_labels, R.logical_not(true_labels))
+    return [R.sum(TP), R.sum(TN), R.sum(FN), R.sum(FP)]
+
+
+def precision(true_labels, pred_labels):
+    var = R.sum(R.equal(true_labels, pred_labels))
+    [TP, TN, FN, FP] = get_TP_TN_FN_FP(true_labels, pred_labels)
+    return R.div(TP, R.add(TP, FP))
+
+
+def recall(true_labels, pred_labels):
+    var = R.equal(true_labels, pred_labels)
+    [TP, TN, FN, FP] = get_TP_TN_FN_FP(true_labels, pred_labels)
+    return R.div(TP, R.add(TP, FN))
+
+
+def f1_score(true_labels, pred_labels):
+    if not isinstance(true_labels, R.Tensor):
+        y_true = R.Tensor(true_labels)
+    if not isinstance(pred_labels, R.Tensor):
+        pred_labels = R.Tensor(pred_labels)
+    pre = precision(true_labels, pred_labels)
+    rec = recall(true_labels, pred_labels)
+    return R.div(R.multiply(R.Scalar(2), R.multiply(pre, rec)), R.add(pre, rec))
 
 # def f1_score(true_labels, pred_labels, average):
 #     """
