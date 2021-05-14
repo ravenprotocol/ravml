@@ -10,7 +10,7 @@ KNN classifier
 '''
 
 
-class KNNClassifier(R.Graph, Base):
+class KNNClassifier(Base):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._k = None
@@ -36,33 +36,40 @@ class KNNClassifier(R.Graph, Base):
         # Params
         self._k = n_neighbours
         self._n_c = n_classes
-        self._n = len(X)
+        self._n = R.shape(self._X)
+        while self._n.status !='computed':
+            pass
+        self._n=int(self._n.output[0])
+
 
     def predict(self, X):
         n_q = len(X)
         X = Tensor(X)
-
         d_list = self.__euclidean_distance(X)
         fe = d_list.foreach(operation='sort')
         sl = fe.foreach(operation='slice', begin=0, size=self._k)
         label = R.Tensor([], name="label")
 
         for i in range(n_q):
-            row = R.gather(d_list, Tensor([i])).reshape(shape=[self._n])
+            row = d_list.gather(Tensor([i])).reshape(shape=[self._n])
             values = sl.gather(Tensor([i])).reshape(shape=[self._k])
-            print(values, row)
-            ind = R.find_indices(row, values)
+            ind = row.find_indices(values)
             ind = ind.foreach(operation='slice', begin=0, size=1)
             y_neighbours = R.gather(self._y, ind).reshape(shape=[self._k])
             label = label.concat(R.mode(y_neighbours))
 
         # Store labels locally
+        while label.status != 'computed':
+            pass
         self._labels = label
 
         return label
 
     def score(self, y_test):
-        return metrics.accuracy(y_test, self._labels)
+        acc= metrics.accuracy(y_test, self._labels)
+        while acc.status!='computed':
+            pass
+        return acc
 
     @property
     def labels(self):
