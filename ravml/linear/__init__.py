@@ -8,6 +8,9 @@ from ravop.core import Tensor, Graph
 
 from ravml import metrics
 
+from .logistic_regression import LogisticRegression
+from .linear_regression import LinearRegression
+
 
 class OrdinaryLeastSquares(Graph):
     def __init__(self, id=None, **kwargs):

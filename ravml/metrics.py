@@ -53,6 +53,7 @@ def f1_score(true_labels, pred_labels):
     rec = recall(true_labels, pred_labels)
     return R.div(R.multiply(R.Scalar(2), R.multiply(pre, rec)), R.add(pre, rec))
 
+
 # def f1_score(true_labels, pred_labels, average):
 #     """
 #     average argument:
@@ -123,7 +124,7 @@ def accuracy(y_true, y_pred):
         if not isinstance(y_pred, R.Op):
             y_pred = R.Tensor(y_pred)
 
-    return R.div(R.sum(R.equal(y_pred , y_true)), y_pred.shape_())
+    return R.div(R.sum(R.equal(y_pred, y_true)), y_pred.shape_())
 
 #
 # def out_pred(y_true, y_pred, per_label=False, mode):

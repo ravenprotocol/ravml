@@ -2,7 +2,6 @@ import logging
 import logging.handlers
 
 import numpy as np
-
 from ravcom import globals as g
 from ravop.core import Graph, Tensor, Scalar
 
