@@ -1,4 +1,4 @@
-from ravcom import ravcom
+from ravcom import ravdb
 import ravop.core as R
 from ravop.core import Tensor, Scalar
 
@@ -74,7 +74,7 @@ class KNNClassifier(Base):
     @property
     def labels(self):
         if self._labels is None:
-            self._labels = ravcom.get_ops_by_name(op_name="label", graph_id=self.id)[0]
+            self._labels = ravdb.get_ops_by_name(op_name="label", graph_id=self.id)[0]
         print(self._labels.id)
 
         if self._labels.status == "computed":
@@ -85,7 +85,7 @@ class KNNClassifier(Base):
     @property
     def points(self):
         if self._X is None:
-            self._X = ravcom.get_ops_by_name(op_name="X_train", graph_id=self.id)[0]
+            self._X = ravdb.get_ops_by_name(op_name="X_train", graph_id=self.id)[0]
 
         if self._X.status == "computed":
             return self._X.output
