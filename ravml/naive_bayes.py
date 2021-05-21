@@ -1,8 +1,8 @@
-import sys
-sys.path.append('../')
 import ravop.core as R
-import metrics
+from ravcom import inform_server
+import time
 
+inform_server()
 class NaiveBayesClassifier:
     
     def __init__(self):
@@ -27,16 +27,17 @@ class NaiveBayesClassifier:
 
         return seperated_classes
 
-    def start_info(self, X):
+    def stat_info(self, X):
 
         """
         Calculate mean and standard deviation
         """
 
         for feature in zip(*X):
+            # print(feature)
             yield {
-                'std': R.std(feature),
-                'mean': R.mean(features)
+                'std': R.std(R.Tensor(list(feature))),
+                'mean': R.mean(R.Tensor(list(feature)))
             }
 
     def fit(self, X, y):
@@ -52,7 +53,7 @@ class NaiveBayesClassifier:
 
             self.class_summary[class_name] = {
                 'prior_proba': len(feature_values)/len(X),
-                'summary': [i for i in self.start_info(feature_values)]
+                'summary': [i for i in self.stat_info(feature_values)],
             }
 
         return self.class_summary
@@ -63,8 +64,17 @@ class NaiveBayesClassifier:
         Gaussian Distribution Function
         """
 
-        exponent = R.exp(-((x - mean)**2 / (2*std**2)))
-        gaussian_func = exponent / (R.square_root(2*(3.1415) * std))
+        #print("10 sec delay")
+        #time.sleep(10)
+
+        # exponent = R.exp(-(x - mean)**2 / (2*std**2))
+        exponent = R.exp(R.div(R.neg(R.pow((R.sub(x, mean)), R.Scalar(2)), R.mul(R.Scalar(2), R.pow(std, R.Scalar(2))))))
+        # gaussian_func = exponent() / (R.square_root(2*(3.1415) * std))
+        gaussian_func = R.div(exponent, R.square_root(R.matmul(std, R.matmul(R.Scalar(2), R.pi))))
+        print("10 sec delay")
+        time.sleep(10)
+
+        return gaussian_func()
 
     def predict(self, X):
 
@@ -82,9 +92,12 @@ class NaiveBayesClassifier:
                 likelihood = 1
 
                 for idx in range(total_features):
-                    feature = row[idx]
+                    feature = R.Tenor(row[idx])
                     mean = features['summary'][idx]['std']
                     stdev = features['summary'][idx]['std']
+                    print("10 sec delay")
+                    time.sleep(10)
+                    print(mean(), stdev())
                     normal_proba = self.distribution(feature, mean, stdev)
                     likelihood = normal_proba
 
