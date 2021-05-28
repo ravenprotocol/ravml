@@ -38,33 +38,34 @@ class DecisionTreeClassifier:
 
     def find_split(self, X, y):
         ideal_col = None
-        ideal_threshold = None
+        ideal_threshold = R.Tensor([None])
 
         num_observations = y.shape_().gather(R.Scalar(0))
         while num_observations.status!='computed':
             pass
         num_observations=int(num_observations.output)
+
         if num_observations <= 1:
             return ideal_col, ideal_threshold
 
-        y = y.reshape(shape=[num_observations])
+        y = y.reshape(shape=R.Tensor([num_observations]))
         count_in_parent = R.Tensor([])
         for c in range(self.num_classes):
             count_in_parent = count_in_parent.concat(R.sum(R.equal(y, R.Scalar(c))).expand_dims())
         gini = R.square(count_in_parent.foreach(operation='div', params=num_observations))
         best_gini = R.sub(R.Scalar(1.0), R.sum(gini))
-        temp_y = y.reshape(shape=[num_observations, 1])
+        temp_y = y.reshape(shape=R.Tensor([num_observations, 1]))
 
 
         for col in range(self.num_features):
-            temp_X = R.gather(R.transpose(X), R.Scalar(col)).reshape(shape=[num_observations, 1])
+            temp_X = R.gather(R.transpose(X), R.Scalar(col)).reshape(shape=R.Tensor([num_observations, 1]))
             all_data = R.concat(temp_X, temp_y, axis=1)
 
             column = R.gather(R.transpose(X), R.Scalar(col))
             ind = column.find_indices(R.sort(R.unique(column)))
             while ind.status != "computed":
                 pass
-            inform_server()
+            #inform_server()
             sorted_data = R.Tensor([])
             for i in ind.output:
                 sorted_data = sorted_data.concat(all_data.gather(R.Tensor(i)))  # need to find another way to sort
@@ -85,14 +86,15 @@ class DecisionTreeClassifier:
                 gini = R.div(R.add(  R.multiply(R.Scalar(i) , gini_left) , R.multiply(R.Scalar(num_observations - i) , gini_right)) , R.Scalar(num_observations))
 
 
-                decision1 = R.logical_and( thresholds.gather(R.Tensor([i])) ,thresholds.gather(R.Tensor([i-1])))
+                decision1 = R.equal( thresholds.gather(R.Tensor([i])) ,thresholds.gather(R.Tensor([i-1])))
                 decision2 = gini.less(best_gini)
                 while decision2.status != "computed":
                     pass
 
-
+                if decision1.output== 1:
+                    continue
                 print(decision2.output==1)
-                if decision2.output == 1 and decision1 != 1:
+                if decision2.output == 1 :
                     best_gini = gini
                     ideal_col = col
                     ideal_threshold = R.div(R.add(thresholds.gather(R.Tensor([i]) ), thresholds.gather(R.Tensor([i - 1])) ), R.Scalar(2))
@@ -106,24 +108,22 @@ class DecisionTreeClassifier:
         predicted_class = R.argmax(pop_per_class)
         node = Node(predicted_class=predicted_class, depth=depth)
         node.samples = R.shape(y).gather(R.Scalar(0))
-
         if depth < self.max_depth:
-            #col, threshold = self.find_split(X, y)
-            col, threshold=0,R.Tensor([12.895])
-
-            '''
-            
-            '''
-            decision=R.Scalar(col).logical_and(threshold)
-            while decision.status != "computed":
+            col, threshold = self.find_split(X, y)
+            while threshold.status != "computed":
                 pass
-            if decision.output== 1:
+            print(col, threshold, "\n=============================")
+            if col is not None and threshold.output is not [None]:
                 indices_left = X.transpose().gather(R.Scalar(col)).less(threshold)
-                X_left, y_left = X.gather(indices_left), y.gather(indices_left)
+                X_left = X.gather(R.find_indices(indices_left,R.Tensor([1])))
+                y_left = y.gather(R.find_indices(indices_left,R.Tensor([1])))
+
                 indices_right =X.transpose().gather(R.Scalar(col)).greater_equal(threshold)
-                X_right, y_right = X.gather(indices_right), y.gather(indices_right)
+                X_right = X.gather(R.find_indices(indices_right, R.Tensor([1])))
+                y_right = y.gather(R.find_indices(indices_right, R.Tensor([1])))
                 node.feature_index = col
                 node.threshold = threshold
+
                 node.left = self.grow_tree(X_left, y_left, depth + 1)
                 node.left.leftbranch = True
                 node.right = self.grow_tree(X_right, y_right, depth + 1)
@@ -149,7 +149,7 @@ X, y = dataset.data, dataset.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
 
 obj = DecisionTreeClassifier(max_depth=3)
-obj.fit(X_train[:4], y_train[:4])
+obj.fit(X_train[:30], y_train[:30])
 pr = obj.predict(X_test)
 
-# print(f1_score(y_test, pr, average='weighted'))
+print(pr)
