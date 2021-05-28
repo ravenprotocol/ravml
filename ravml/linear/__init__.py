@@ -2,11 +2,14 @@ import logging
 import logging.handlers
 
 import ravop.core as R
-from ravcom import ravcom
+from ravcom import ravdb
 from ravcom import globals as g
 from ravop.core import Tensor, Graph
 
 from ravml import metrics
+
+from .logistic_regression import LogisticRegression
+from .linear_regression import LinearRegression
 
 
 class OrdinaryLeastSquares(Graph):
@@ -45,7 +48,7 @@ class OrdinaryLeastSquares(Graph):
     @property
     def coefficients(self):
         if self._coefficients is None:
-            self._coefficients = ravcom.get_ops_by_name(op_name="coefficients", graph_id=self.id)[0]
+            self._coefficients = ravdb.get_ops_by_name(op_name="coefficients", graph_id=self.id)[0]
         print(self._coefficients.id)
 
         if self._coefficients.status == "computed":

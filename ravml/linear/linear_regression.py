@@ -2,12 +2,12 @@ import logging
 import logging.handlers
 
 import numpy as np
-
+import ravop.core as R
 from ravcom import globals as g
 from ravop.core import Graph, Tensor, Scalar
+
 from ravml import metrics
-import ravop.core as R
-from .config import RAVML_LOG_FILE
+from ravml.config import RAVML_LOG_FILE
 
 
 class LinearRegression(Graph):
@@ -89,7 +89,7 @@ class LinearRegression(Graph):
 
     def __compute_cost(self, y, y_pred, no_samples, name="cost"):
         """Cost function"""
-        return R.multiply(R.Scalar(1.0/(2.0*no_samples.output)), R.sum(R.square(R.sub(y_pred, y))), name=name)
+        return R.multiply(R.Scalar(1.0 / (2.0 * no_samples.output)), R.sum(R.square(R.sub(y_pred, y))), name=name)
         # a = y_pred.sub(y)
         # b = R.square(a).sum()
         # R.one()
