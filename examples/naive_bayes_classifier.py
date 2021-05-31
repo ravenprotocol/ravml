@@ -1,29 +1,33 @@
-from ravml.classifier.naive_bayes import NaiveBayesClassifier
+import sys
 
-import urllib2
+
+from naive_bayes import NaiveBayesClassifier
+from ravcom import inform_server
 import random
 from csv import reader
 
-wine_data_url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
+import numpy as np
+import ravop.core as R
+
+inform_server()
+
+wine_data_url = "wine.data"
 
 def load_csv(url):
 
-    """
-    Load the wine csv data
-    """
-
-    response = urllib2.urlopen(wine_data_url)
-    csv_data = reader(response)
-
-    dataset = []
-    for row in csv_data:
-        if not row:
-            continue
-        dataset.append(row)
+    dataset = list()
+    with open(url, 'r') as file:
+        csv_data = reader(file)
+        for row in csv_data:
+            if not row:
+                continue
+            dataset.append(row)
 
     return dataset
 
+
 df = load_csv(wine_data_url)
+print("Dataset Downloaded")
 
 # Convert string to float
 for i in range(len(df)):
@@ -61,8 +65,24 @@ for i in range(len(test)):
 
 model = NaiveBayesClassifier()
 
+
+
 model.fit(X_train, y_train)
+y_preds = model.predict(X_test)
 
-y_pred = model.predict(X_test)
+calc_preds = []
+for y_pred in y_preds:
+    
+    keys = list(y_pred.keys())
+    # values = list(y_pred.values())
+    #prediction = keys[np.argmax(np.asarray(values))]
+    calc_pred = {key: y_pred[key]() for key in keys}
+    calc_preds.append(calc_pred)
 
-print("NaiveBayesClassifier accuracy: {0:.3f}".format(model.accuracy(y_test, y_pred)))
+MAPs = []
+for pred in calc_preds:
+    
+    MAP = max(pred, key= pred.get)
+    MAPs.append(MAP)
+
+print("NaiveBayesClassifier accuracy: {0:.3f}".format(model.accuracy(y_test, MAPs)))
