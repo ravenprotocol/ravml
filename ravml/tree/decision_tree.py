@@ -1,9 +1,9 @@
 import ravop.core as R
-import sys
+
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from ravml.metrics import f1_score
-from ravcom import inform_server
+from sklearn.metrics import f1_score
+
 
 
 class Node:
@@ -91,16 +91,16 @@ class DecisionTreeClassifier:
                 decision2 = gini.less(best_gini)
                 while decision2.status != "computed":
                     pass
-                #print(".1",decision1)
+
                 if decision1.output == 1:
                     continue
-                #print("____")
+
                 if decision2.output == 1:
                     best_gini = gini
                     ideal_col = col
                     ideal_threshold = R.div(
                         R.add(thresholds.gather(R.Tensor([i])), thresholds.gather(R.Tensor([i - 1]))), R.Scalar(2))
-        #print(ideal_col, ideal_threshold)
+
         return ideal_col, ideal_threshold
 
     def grow_tree(self, X, y, depth=0):
@@ -114,7 +114,6 @@ class DecisionTreeClassifier:
         node = Node(predicted_class=predicted_class.output, depth=depth)
         node.samples = R.shape(y).gather(R.Scalar(0))
         if depth < self.max_depth:
-            #col, threshold = self.find_split(X, y)
             col=12
             threshold=R.Tensor([760])
             while threshold.status != "computed":
@@ -124,7 +123,6 @@ class DecisionTreeClassifier:
             while z1.status!="computed":
                 pass
             print(z,z1,X,y)
-            #print(col, threshold, "\n=============================")
             if col is not None and threshold.output is not [None]:
                 indices_left = X.transpose().gather(R.Scalar(col)).less(threshold)
                 X_left = X.gather(R.find_indices(indices_left, R.Tensor([1])).reshape(shape=R.sum(indices_left).expand_dims() ) )
@@ -156,13 +154,5 @@ class DecisionTreeClassifier:
         return predictions
 
 
-dataset = load_wine()
-X, y = dataset.data, dataset.target
-X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
 
-obj = DecisionTreeClassifier(max_depth=3)
-obj.fit(X_train[:30], y_train[:30])
-pr = obj.predict(X_test)
-
-print(f1_score(y_test, pr, average='weighted'))
 
