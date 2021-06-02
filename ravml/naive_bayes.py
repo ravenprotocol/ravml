@@ -70,7 +70,7 @@ class NaiveBayesClassifier(Graph):
         denominator = R.Scalar(2) * R.square(std)
         frac = R.div(numerator,denominator)
         exponent = R.exp(R.Scalar(-1) * frac)
-        two_pi = R.Scalar(2) *  Rpi()
+        two_pi = R.Scalar(2) *  R.pi()
         gaussian_denominator = R.square_root(two_pi) * std
         gaussian_func = R.div(exponent, gaussian_denominator)
         return gaussian_func
