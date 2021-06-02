@@ -1,8 +1,5 @@
 import ravop.core as R
 
-from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
 
 
 
@@ -34,7 +31,6 @@ class DecisionTreeClassifier:
             pass
         self.num_classes = int(num_classes.output)
         self.num_features = int(num_features.output)
-        print(self.num_classes, self.num_features)
         self.tree = self.grow_tree(X, y)
 
     def find_split(self, X, y):
@@ -110,19 +106,17 @@ class DecisionTreeClassifier:
         predicted_class = R.argmax(pop_per_class)
         while predicted_class.status != "computed":
             pass
-        print(predicted_class,predicted_class.output)
+
         node = Node(predicted_class=predicted_class.output, depth=depth)
         node.samples = R.shape(y).gather(R.Scalar(0))
         if depth < self.max_depth:
-            col=12
-            threshold=R.Tensor([760])
+            col,threshold =self.find_split(X, y)
             while threshold.status != "computed":
                 pass
             z=X.shape_()
             z1=y.shape_()
             while z1.status!="computed":
                 pass
-            print(z,z1,X,y)
             if col is not None and threshold.output is not [None]:
                 indices_left = X.transpose().gather(R.Scalar(col)).less(threshold)
                 X_left = X.gather(R.find_indices(indices_left, R.Tensor([1])).reshape(shape=R.sum(indices_left).expand_dims() ) )
