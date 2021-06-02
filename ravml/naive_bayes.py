@@ -1,9 +1,9 @@
 import ravop.core as R
+from ravop.core import Graph
 from ravcom import inform_server
 import time
 
-inform_server()
-class NaiveBayesClassifier:
+class NaiveBayesClassifier(Graph):
     
     def __init__(self):
         pass
@@ -34,10 +34,13 @@ class NaiveBayesClassifier:
         """
 
         for feature in zip(*X):
-            # print(feature)
+
+            feature = R.Tensor(list(feature), name = 'feature')
+            std = R.std(feature)
+            mean = R.mean(feature)
             yield {
-                'std': R.std(R.Tensor(list(feature))),
-                'mean': R.mean(R.Tensor(list(feature)))
+                'std': std,
+                'mean': mean
             }
 
     def fit(self, X, y):
@@ -61,20 +64,16 @@ class NaiveBayesClassifier:
     def distribution(self, x, mean, std):
 
         """
-        Gaussian Distribution Function
-        """
-
-        #print("10 sec delay")
-        #time.sleep(10)
-
-        # exponent = R.exp(-(x - mean)**2 / (2*std**2))
-        exponent = R.exp(R.div(R.neg(R.pow((R.sub(x, mean)), R.Scalar(2)), R.mul(R.Scalar(2), R.pow(std, R.Scalar(2))))))
-        # gaussian_func = exponent() / (R.square_root(2*(3.1415) * std))
-        gaussian_func = R.div(exponent, R.square_root(R.matmul(std, R.matmul(R.Scalar(2), R.pi))))
-        print("10 sec delay")
-        time.sleep(10)
-
-        return gaussian_func()
+        Get the Gaussian distribution
+        """ 
+        numerator = R.square(x - mean)
+        denominator = R.Scalar(2) * R.square(std)
+        frac = R.div(numerator,denominator)
+        exponent = R.exp(R.Scalar(-1) * frac)
+        two_pi = R.Scalar(2) *  Rpi()
+        gaussian_denominator = R.square_root(two_pi) * std
+        gaussian_func = R.div(exponent, gaussian_denominator)
+        return gaussian_func
 
     def predict(self, X):
 
@@ -84,30 +83,29 @@ class NaiveBayesClassifier:
 
         MAPs = []
 
-        for row in X:
+        for index, row in enumerate(X):
             joint_proba = {}
 
             for class_name, features in self.class_summary.items():
                 total_features = len(features['summary'])
-                likelihood = 1
+                likelihood = R.Scalar(1)
 
                 for idx in range(total_features):
-                    feature = R.Tenor(row[idx])
-                    mean = features['summary'][idx]['std']
+                    # print("feature: ", row[idx])
+                    feature = R.Scalar(row[idx])
+                    mean = features['summary'][idx]['mean']
                     stdev = features['summary'][idx]['std']
-                    print("10 sec delay")
-                    time.sleep(10)
-                    print(mean(), stdev())
                     normal_proba = self.distribution(feature, mean, stdev)
-                    likelihood = normal_proba
+                    likelihood = likelihood * normal_proba
 
-                prior_proba = features['prior_proba']
+                prior_proba = R.Scalar(features['prior_proba'])
+
+                my_val = prior_proba * likelihood
+
                 joint_proba[class_name] = prior_proba * likelihood
+            MAPs.append(joint_proba)
 
-            MAP = max(joint_proba, key= joint_proba.get)
-            MAPs.append((MAP))
-
-            return MAPs
+        return MAPs
 
     
     def accuracy(self, y_test, y_pred):
