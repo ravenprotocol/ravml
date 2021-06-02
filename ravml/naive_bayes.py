@@ -1,7 +1,6 @@
 import ravop.core as R
 from ravop.core import Graph
 from ravcom import inform_server
-import time
 
 class NaiveBayesClassifier(Graph):
     
