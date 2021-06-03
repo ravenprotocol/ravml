@@ -65,14 +65,12 @@ class NaiveBayesClassifier(Graph):
 
         """
         Gaussian Distribution Function
-        exponent = np.exp(-((x-mean)**2 / (2*std**2)))
-        gauss_func = exponent / (np.sqrt(2*np.pi)*std)
         """ 
         numerator = R.square(x - mean)
         denominator = R.Scalar(2) * R.square(std)
         frac = R.div(numerator,denominator)
         exponent = R.exp(R.Scalar(-1) * frac)
-        two_pi = R.Scalar(2) *  R.Scalar(3.141592653589793)
+        two_pi = R.Scalar(2) *  R.pi()
         gaussian_denominator = R.square_root(two_pi) * std
         gaussian_func = R.div(exponent, gaussian_denominator)
         return gaussian_func
@@ -86,8 +84,7 @@ class NaiveBayesClassifier(Graph):
         MAPs = []
 
         for index, row in enumerate(X):
-            print("Row: ", index)
-            print()
+            
             joint_proba = {}
 
             for class_name, features in self.class_summary.items():
