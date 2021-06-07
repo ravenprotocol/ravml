@@ -1,7 +1,6 @@
+import matplotlib.pyplot as plt
 import ravop.core as R
 from ravcom import inform_server
-import matplotlib.pyplot as plt
-
 inform_server()
 
 class LinearRegression():
