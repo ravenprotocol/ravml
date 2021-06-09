@@ -1,98 +1,96 @@
-import logging
-import logging.handlers
-
+import ravop.core as R
 import numpy as np
-from ravcom import globals as g
-from ravop.core import Graph, Tensor, Scalar
+import matplotlib.pyplot as plt
 
+class LogisticRegression():
+    def __init__(self,lr=0.01, num_iter=10, fit_intercept=True, verbose=True):
+        self.lr = R.Scalar(lr)
+        self.num_iter = num_iter
+        self.fit_intercept = fit_intercept
+        self.verbose = verbose
+        self.x_shape1 = None
+        self.losses = []
+        self.preds = None
 
-class LogisticRegression(Graph):
-    def __init__(self, id=None, **kwargs):
-        super().__init__(id=id, **kwargs)
+    def __add_intercept(self, X):
+        self.x_shape1 = X.shape[1]+1
+        intercept = np.ones((X.shape[0], 1))
+        temp = np.concatenate((intercept, X), axis=1)
+        return R.Tensor(temp)
 
-        self.__setup_logger()
+    def __sigmoid(self, z):
+        return (R.Scalar(1).div(R.Scalar(1).add(R.exp(z.multiply(R.Scalar(-1))))))
 
-        # Define hyperparameters
-        self._learning_rate = kwargs.get("learning_rate", None)
-        if self._learning_rate is None:
-            self._learning_rate = 0.03
+    def __loss(self, h, y):
+        c1 = R.Scalar(-1).multiply(y.multiply(h.natlog()))
+        c2 = (R.Scalar(1).sub(y)).multiply((R.Scalar(1).sub(h)).natlog())
+        c3 = c1.sub(c2)
+        c4 = c3.sum().div(R.Scalar(self.leny))
+        return c4
 
-    def __setup_logger(self):
-        # Set up a specific logger with our desired output level
-        self.logger = logging.getLogger(LogisticRegression.__class__.__name__)
-        self.logger.setLevel(logging.DEBUG)
+    def fit(self, X, y):
+        if self.fit_intercept:
+            X = self.__add_intercept(X)
+        self.leny = len(y)
+        Y = R.Tensor(y)
+        # weights initialization
+        self.theta = R.Tensor([0]*self.x_shape1)
 
-        # Add the log message handler to the logger
-        handler = logging.handlers.RotatingFileHandler(g.ravop_log_file)
+        for i in range(self.num_iter):
+            h = self.__sigmoid(X.dot(self.theta))
+            while h.status != 'computed':
+                pass
+            w = X.transpose()
+            while w.status != 'computed':
+                pass
+            self.theta = self.theta.sub(self.lr.multiply((w.dot(h.sub(Y)).div(R.Scalar(self.leny)))))
+            while self.theta.status!='computed':
+                pass
+            loss = self.__loss(self.__sigmoid(X.dot(self.theta)), Y)
+            while loss.status!='computed':
+                pass
+            if (self.verbose == True):
+                self.losses.append(loss)
+            print('Iteration : ',i)
 
-        self.logger.addHandler(handler)
+    def predict_prob(self, X):
+        if self.fit_intercept:
+            X = self.__add_intercept(X)
+        return self.__sigmoid(X.dot(self.theta))
 
-    def train(self, X, y, iter=10):
-        # Remove old ops and start from scratch
-        self.clean()
+    def predict(self, X):
+        p = self.predict_prob(X)
+        while p.status!='computed':
+            pass
+        t = p()
+        return t.round()
 
-        # Convert input values to RavOp tensors
-        X = Tensor(X, name="X")
-        y = Tensor(y, name="y")
+    def plot_loss(self):
+        training_loss = []
+        for element in self.losses:
+            while element.status != 'computed':
+                pass
+            training_loss.append(element())
+        # plotting Loss
+        plt.plot(training_loss)
+        plt.ylabel('Loss')
+        plt.xlabel("Iteration")
+        plt.show()
 
-        # Initialize params
-        learning_rate = Scalar(self._learning_rate)
-        size = X.shape[1]
-        no_samples = Scalar(X.shape[0])
-        weights = Tensor(np.random.uniform(0, 1, size).reshape((size, 1)), name="weights")
-
-        # 1. Predict - Calculate y_pred
-        y_pred = self.sigmoid(X.matmul(weights), name="y_pred")
-
-        # 2. Compute cost
-        cost = self.__compute_cost(y, y_pred, no_samples)
-
-        for i in range(iter):
-            y_pred = self.sigmoid(X.matmul(weights), name="y_pred{}".format(i))
-            weights = weights.sub(learning_rate.div(no_samples).elemul(X.trans().matmul(y_pred.sub(y))),
-                                  name="weights{}".format(i))
-            cost = self.__compute_cost(y=y, y_pred=y_pred, no_samples=no_samples, name="cost{}".format(i))
-
-        return cost, weights
-
-    def predict(self, x):
-        """Predict values"""
-        weights = self.weights
-
-        # Local predict
-        return 1 / (1 + np.exp(-np.matmul(x, weights)))
-
-    def __compute_cost(self, y, y_pred, no_samples, name="cost"):
-        """Cost function"""
-        epsilon = Scalar(1e-5)
-        one = Scalar(1)
-
-        c1 = y.neg().trans().matmul(y_pred.add(epsilon).natlog())
-        c2 = one.sub(y).trans().matmul(one.sub(y_pred).add(epsilon).natlog())
-        cost = one.div(no_samples).elemul(c1.sub(c2), name=name)
-        return cost
-
-    def sigmoid(self, x, name="sigmoid"):
-        """Sigmoid activation function"""
-        # 1/(1+e^-x)
-        one = Scalar(1)
-        return one.div(x.neg().exp().add(one), name=name)
-
-    @property
-    def weights(self):
-        """Retrieve weights"""
-        ops = self.get_ops_by_name(op_name="weight", graph_id=self.id)
-        if len(ops) == 0:
-            raise Exception("You need to train your model first")
-
-        # Get weights
-        weight_op = ops[-1]
-        if weight_op.status == "pending" or weight_op.status == "computing":
-            raise Exception("Please wait. Your model is getting trained")
-
-        weight = weight_op.output
-
-        return weight
-
-    def __str__(self):
-        return "LogisticRegression:Graph Id:{}\n".format(self.id)
+    def visualize(self,X,y):
+        plt.clf()
+        plt.figure(figsize=(10, 6))
+        plt.scatter(X[y == 0][:, 0], X[y == 0][:, 1], color='b', label='0')
+        plt.scatter(X[y == 1][:, 0], X[y == 1][:, 1], color='r', label='1')
+        plt.legend()
+        x1_min, x1_max = X[:, 0].min(), X[:, 0].max(),
+        x2_min, x2_max = X[:, 1].min(), X[:, 1].max(),
+        xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max), np.linspace(x2_min, x2_max))
+        grid = np.c_[xx1.ravel(), xx2.ravel()]
+        self.probs = self.predict_prob(grid) 
+        while self.probs.status != 'computed':
+            pass
+        self.probs = np.array(self.probs())
+        self.probs = self.probs.reshape(xx1.shape)
+        plt.contour(xx1, xx2, self.probs, [0.5], linewidths=1, colors='black')
+        plt.show()
