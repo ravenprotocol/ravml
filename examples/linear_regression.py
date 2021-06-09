@@ -1,4 +1,4 @@
-from linear_regression import LinearRegression
+from ravml.linear.linear_regression import LinearRegression
 import numpy as np
 
 def preprocess(data):
