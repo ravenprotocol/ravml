@@ -12,7 +12,7 @@ def preprocess(data):
 iterations = 20
 alpha = 0.01
 
-data = np.loadtxt('data_linreg.txt', delimiter=',')
+data = np.loadtxt('examples/data_linreg.txt', delimiter=',')
 x,y,theta = preprocess(data)
 
 model = LinearRegression(x,y,theta)
