@@ -31,9 +31,9 @@ class LinearRegression():
             print('Iteration : ',e)
         op_theta = self.theta()
         print('Theta found by gradient descent: intercept={0}, slope={1}'.format(op_theta[0],op_theta[1]))
-        return self.theta
+        return self.theta, op_theta[0], op_theta[1]
 
-    def plot_graph(self,optimal_theta):
+    def plot_graph(self,optimal_theta, res_file_path):
         optimal_theta = optimal_theta()
         fig, ax = plt.subplots()
         ax.plot(self.raw_X[:,1], self.raw_y[:,0], 'o', label='Raw Data')
@@ -41,4 +41,5 @@ class LinearRegression():
         plt.ylabel('Profit')
         plt.xlabel('Population of City')
         legend = ax.legend(loc='upper center', shadow=True)
+        plt.savefig(res_file_path)
         plt.show()
