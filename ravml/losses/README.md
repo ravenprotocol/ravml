@@ -5,7 +5,7 @@
 </h1>
 </div align></b>
 
-### loss functions in ravml written using the ravop library compute the different loss values.
+### loss functions in ravml written using the ravop library to compute the different loss values.
 
 <div align='center'>
 

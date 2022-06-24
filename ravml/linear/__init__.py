@@ -8,7 +8,7 @@ from ravop.core import Tensor, Graph
 
 from ravml.metrics import metrics
 
-from .logistic_regression import LogisticRegression
+from .logistic_regression.logistic_regression import LogisticRegression
 from .linear_regression.linear_regression import LinearRegression
 
 

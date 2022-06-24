@@ -24,7 +24,9 @@ print("accuracy=",acc())
 # r2_score
 </div align='center'>
 
-    r2_score(R-squared/coefficient of determination) is a metric used in case regression models to see how well the data fit the model.
+r2_score is a metric used in case regression models to see how well the data fit the model.
+
+    r2_score(R-squared/coefficient of determination)
 
 ## Implementation:
 ```python
@@ -38,7 +40,23 @@ print("r2_score=",r2())
 
 # get_TP_TN_FN_FP
 </div align='center'>
-    get_TP_TN_FN_FP() function returns the metrics True positive , True Negative ,False Negative and False Positive in a list.
+    
+get_TP_TN_FN_FP() function returns the metrics True positive , True Negative ,False Negative and False Positive in a list.
+
+`True positive` :
+    
+    A false positive is an outcome where the model correctly predicts the positive class. 
+`True Negative` : 
+
+    A True Negative is an outcome where the model correctly predicts the negative class. 
+`False Negative` : 
+
+    A False Negative is an outcome where the model incorrectly predicts the negative class. 
+`False Positive` : 
+
+    A false positive is an outcome where the model incorrectly predicts the positive class
+
+
 
 
 ## Implementation:
@@ -57,7 +75,7 @@ print(" False Positive",metric[3]())
 # precision
 </div align='center'>
     
-    Precision returns the proportions of the positive predictions that were actually correct.
+Precision returns the proportions of the positive predictions that were actually correct.
 
     Precision= True Positives / (True Positives + False Positives)
 
@@ -75,7 +93,7 @@ print("evaluated metric",metric())
 # recall
 </div align='center'> 
     
-    Precision returns the proportions of the actual positives that were identified correctly.
+Precision returns the proportions of the actual positives that were identified correctly.
 
     Precision= True Positives / (True Positives + False Negatives)
 
