@@ -1,7 +1,7 @@
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
-from ravml.classifier import KNNClassifier
+from ravml.neighbors import KNNClassifier
 
 # from ravcom import inform_server
 

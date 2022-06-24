@@ -6,10 +6,10 @@ from ravcom import ravdb
 from ravcom import globals as g
 from ravop.core import Tensor, Graph
 
-from ravml import metrics
+from ravml.metrics import metrics
 
 from .logistic_regression import LogisticRegression
-from .linear_regression import LinearRegression
+from .linear_regression.linear_regression import LinearRegression
 
 
 class OrdinaryLeastSquares(Graph):

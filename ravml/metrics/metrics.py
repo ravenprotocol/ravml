@@ -14,12 +14,12 @@ def r2_score(y_true, y_pred):
 
     print(type(y_true), type(y_pred))
 
-    scalar1 = R.Scalar(1)
+    scalar1 = R.t(1)
 
-    SS_res = R.sum(R.square(R.sub(y_pred, y_true)), name="ss_res")
-    SS_tot = R.sum(R.square(R.sub(y_true, R.mean(y_true))), name="ss_tot")
+    SS_res = R.sum(R.square(R.sub(y_pred, y_true)))
+    SS_tot = R.sum(R.square(R.sub(y_true, R.mean(y_true))))
 
-    return R.sub(scalar1, R.div(SS_res, SS_tot), name="r2_score")
+    return R.sub(scalar1, R.div(SS_res, SS_tot))
 
 
 def get_TP_TN_FN_FP(true_labels, pred_labels):
@@ -124,7 +124,7 @@ def accuracy(y_true, y_pred):
         if not isinstance(y_pred, R.Op):
             y_pred = R.Tensor(y_pred)
 
-    return R.div(R.sum(R.equal(y_pred, y_true)), y_pred.shape_())
+    return R.div(R.sum(R.equal(y_pred, y_true)), y_pred.shape())
 
 #
 # def out_pred(y_true, y_pred, per_label=False, mode):
