@@ -1,6 +1,6 @@
 import ravop.core as R
 
-from ravml.activations import softmax, sigmoid
+from ravml.activations.activations import softmax, sigmoid
 
 
 def mean_absolute_error(y_true, y_pred):

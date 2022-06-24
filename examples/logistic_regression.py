@@ -1,4 +1,4 @@
-from ravml.linear.logistic_regression import LogisticRegression
+from ravml.linear.logistic_regression.logistic_regression import LogisticRegression
 from sklearn import datasets
 
 iris = datasets.load_iris()
