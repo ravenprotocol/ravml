@@ -1,13 +1,13 @@
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
-from ravml.cluster.kmeans import KMeans
+from ravml.cluster import MiniBatchKMeans
 import ravop.core as R
 
 algo = R.Graph(name='kmeans', algorithm='kmeans', approach='distributed')
 
 
-k = KMeans()
+k = MiniBatchKMeans()
 
 iris = load_iris()
 

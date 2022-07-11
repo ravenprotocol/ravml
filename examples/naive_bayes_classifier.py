@@ -2,14 +2,14 @@ import sys
 
 
 from naive_bayes import NaiveBayesClassifier
-from ravcom import inform_server
+
 import random
 from csv import reader
 
 import numpy as np
 import ravop.core as R
 
-inform_server()
+
 
 wine_data_url = "wine.data"
 

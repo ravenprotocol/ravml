@@ -1,4 +1,3 @@
-
 import ravop.core  as R
 import numpy as np
 import pathlib

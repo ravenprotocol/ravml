@@ -1,4 +1,4 @@
-from ravml.neighbors.knn import KNNClassifier
+from ravml.neighbors.knn import KNNRegressor
 import ravop.core as R
 
 from sklearn.datasets import load_iris
@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 
 algo = R.Graph(name='knn', algorithm='knn', approach='distributed')
 
-knn = KNNClassifier()
+knn = KNNRegressor()
 iris = load_iris()
 
 X = iris.data[:700]
