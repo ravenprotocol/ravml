@@ -1,5 +1,6 @@
-import os
 from dotenv import load_dotenv
+from sklearn.model_selection import train_test_split
+
 load_dotenv()
 import ravop as R
 from sklearn.datasets import load_iris
@@ -13,12 +14,10 @@ iris = load_iris()
 X = iris.data[:5500]
 y = iris.target[:5500]
 X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.3)
-import numpy as np
-knn=KNNClassifier()
-knn.fit(X_train,y_train, n_neighbours=20,n_classes=3)
+knn = KNNClassifier()
+knn.fit(X_train, y_train, n_neighbours=20, n_classes=3)
 knn.predict(X_test)
 knn.score(y_test=y_test)
-
 
 R.activate()
 

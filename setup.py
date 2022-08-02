@@ -1,18 +1,27 @@
+from pathlib import Path
+
 from setuptools import setup, find_packages
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='ravml',
-    version='0.1-alpha',
+    version='0.5',
+    license='MIT',
+    author="Raven Protocol",
+    author_email='kailash@ravenprotocol.com',
     packages=find_packages(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    url='https://github.com/ravenprotocol/ravdl',
+    keywords='Ravml, machine learning library, algorithms',
     install_requires=[
-        "numpy==1.20.1",
-        "scikit-learn==0.24.1",
-        "pandas==1.2.3",
-        "matplotlib==3.3.4",
-        "scikit-learn"
-    ],
-    dependency_links=[
-        "https://github.com/ravenprotocol/ravcom.git@0.1-alpha",
-        "https://github.com/ravenprotocol/ravop.git@0.1-alpha",
+        "numpy",
+        "scikit-learn",
+        "pandas",
+        "matplotlib",
+        "ravop",
+        "python-dotenv"
     ]
 )

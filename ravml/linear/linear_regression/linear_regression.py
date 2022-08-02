@@ -1,12 +1,11 @@
-import ravop.core  as R
-import numpy as np
-import pathlib
-from ravml.metrics import metrics
 import matplotlib.pyplot as plt
+import ravop.core as R
+
+from ravml.metrics import metrics
 
 
 class LinearRegression():
-    def __init__(self,x_points,y_points,theta):
+    def __init__(self, x_points, y_points, theta):
         self.raw_X = x_points
         self.raw_y = y_points
         self.m = R.t(self.raw_y.shape[0])
@@ -20,20 +19,20 @@ class LinearRegression():
 
     def gradient_descent(self, alpha, num_iters):
         alpha_ = R.t(alpha)
-        for e in range(1,num_iters+1):
+        for e in range(1, num_iters + 1):
             residual = self.X.dot(self.theta).sub(self.y)
             temp = self.theta.sub((alpha_.div(self.m)).multiply(self.X.transpose().dot(residual)))
-            print('Iteration : ',e)
-            self.theta=temp
+            print('Iteration : ', e)
+            self.theta = temp
         self.op_theta = self.theta
         self.theta.persist_op(name="theta")
 
-    def predict(self,X_test):
-        xt=X_test
+    def predict(self, X_test):
+        xt = X_test
         if not isinstance(X_test, R.Op):
-            xt=R.t(X_test)
-        
-        y_val=xt.dot(self.op_theta).squeeze()
+            xt = R.t(X_test)
+
+        y_val = xt.dot(self.op_theta).squeeze()
         y_val.persist_op(name="predicted values")
         return y_val
 
@@ -47,36 +46,34 @@ class LinearRegression():
         y_true = y
 
         if name == "r2":
-            score=metrics.r2_score(y_true, y_pred)
+            score = metrics.r2_score(y_true, y_pred)
         else:
             return None
-        score.persist_op(name= "score" )
-    
-    def plot_graph(self,optimal_theta):
+        score.persist_op(name="score")
+
+    def plot_graph(self, optimal_theta):
         fig, ax = plt.subplots()
-        ax.plot(self.raw_X[:,1], self.raw_y[:,0], 'o', label='Raw Data')
-        ax.plot(self.raw_X[:,1], self.raw_X.dot(optimal_theta), linestyle='-', label='Linear Regression')
+        ax.plot(self.raw_X[:, 1], self.raw_y[:, 0], 'o', label='Raw Data')
+        ax.plot(self.raw_X[:, 1], self.raw_X.dot(optimal_theta), linestyle='-', label='Linear Regression')
 
         plt.show()
 
-
     def set_params(self, **kwargs):
-        param_dict={
+        param_dict = {
             'theta': self.theta(),
-            'X':self.X(),
-            'y':self.y()
+            'X': self.X(),
+            'y': self.y()
         }
         for i in kwargs.keys():
             if i in param_dict.keys():
-                param_dict[i]=kwargs[i]
+                param_dict[i] = kwargs[i]
 
         return param_dict
 
-        
     def get_params(self):
-        param_dict={
+        param_dict = {
             'theta': self.theta(),
-            'X':self.X(),
-            'y':self.y()
+            'X': self.X(),
+            'y': self.y()
         }
         return param_dict

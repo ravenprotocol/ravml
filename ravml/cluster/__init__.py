@@ -1,1 +1,1 @@
-from .kmeans import KMeans, MiniBatchKMeans
+from kmeans.kmeans import KMeans, MiniBatchKMeans

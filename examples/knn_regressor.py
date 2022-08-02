@@ -1,17 +1,16 @@
-from ravml.neighbors.knn import KNNRegressor
-
-import os
 from dotenv import load_dotenv
+
 load_dotenv()
-import ravop.core as R
+
+from ravml.neighbors import KNNRegressor
+import ravop as R
+
 R.initialize("<TOKEN>")
 R.flush()
 R.Graph(name='knn', algorithm='knn', approach='distributed')
 
-
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-
 
 iris = load_iris()
 
@@ -20,7 +19,7 @@ y = iris.target[:1500]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.3)
 
-knn=KNNRegressor()
+knn = KNNRegressor()
 knn.fit(X_train, y_train, n_neighbours=5)
 knn.predict(X_test)
 knn.score(y_test=y_test)

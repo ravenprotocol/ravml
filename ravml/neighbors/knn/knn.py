@@ -1,7 +1,7 @@
 import ravop.core as R
-from ravop.core import Tensor, Scalar
 
 from ravml.metrics import metrics
+
 
 class KNNClassifier():
     def __init__(self, **kwargs):
@@ -25,7 +25,6 @@ class KNNClassifier():
         self._k = n_neighbours
         self._n_c = n_classes
         self._n = len(X)
-       
 
     def predict(self, X):
         n_q = len(X)
@@ -35,7 +34,6 @@ class KNNClassifier():
         fe = d_list.foreach(operation='sort')
         sl = fe.foreach(operation='slice', begin=0, size=self._k)
         label = R.Tensor([])
-        
 
         for i in range(n_q):
             row = d_list.gather(R.t([i])).squeeze()
@@ -54,7 +52,6 @@ class KNNClassifier():
         acc.persist_op(name="accuracy")
         return acc
 
-    
     @property
     def label(self):
         return self._label
@@ -64,27 +61,25 @@ class KNNClassifier():
         return self._X
 
     def set_params(self, **kwargs):
-        param_dict={
+        param_dict = {
             'labels': self._labels,
-            'X':self._X,
-            'y':self._y,
-            'k':self.k
+            'X': self._X,
+            'y': self._y,
+            'k': self.k
         }
         for i in kwargs.keys():
             if i in param_dict.keys():
-                param_dict[i]=kwargs[i]
+                param_dict[i] = kwargs[i]
         return param_dict
 
     def get_params(self):
-        param_dict={
+        param_dict = {
             'labels': self._labels,
-            'X':self._X,
-            'y':self._y,
-            'k':self.k
+            'X': self._X,
+            'y': self._y,
+            'k': self.k
         }
         return param_dict
-
-
 
 
 class KNNRegressor():
@@ -101,14 +96,13 @@ class KNNRegressor():
         X = R.expand_dims(X, axis=1)
         return R.square_root(R.sub(X, self.X_train).pow(R.t(2)).sum(axis=2))
 
-    def fit(self, X_train,Y_train, n_neighbours=None):
+    def fit(self, X_train, Y_train, n_neighbours=None):
         self.k = n_neighbours
         self.n = len(X_train)
         self.X_train = R.t(X_train)
         self._k = n_neighbours
 
         self._y = R.t(Y_train)
-        
 
     def predict(self, X):
         n_q = len(X)
@@ -119,7 +113,6 @@ class KNNRegressor():
 
         pred = R.Tensor([])
         for i in range(n_q):
-
             row = d_list.gather(R.t([i])).squeeze()
             values = sl.gather(R.t([i])).squeeze()
             ind = row.find_indices(values).foreach(operation='slice', begin=0, size=1)
@@ -130,9 +123,8 @@ class KNNRegressor():
         pred.persist_op(name="predicted_label")
 
     def score(self, y_test):
-        score=metrics.r2_score(y_test, self._label)
+        score = metrics.r2_score(y_test, self._label)
         score.persist_op(name="r2score_knn_classifier")
-
 
     @property
     def label(self):
@@ -143,25 +135,22 @@ class KNNRegressor():
         return self._X
 
     def set_params(self, **kwargs):
-        param_dict={
+        param_dict = {
             'labels': self._labels,
-            'X':self._X,
-            'y':self._y,
-            'k':self.k
+            'X': self._X,
+            'y': self._y,
+            'k': self.k
         }
         for i in kwargs.keys():
             if i in param_dict.keys():
-                param_dict[i]=kwargs[i]
+                param_dict[i] = kwargs[i]
         return param_dict
 
     def get_params(self):
-        param_dict={
+        param_dict = {
             'labels': self._labels,
-            'X':self._X,
-            'y':self._y,
-            'k':self.k
+            'X': self._X,
+            'y': self._y,
+            'k': self.k
         }
         return param_dict
-
-
-

@@ -1,11 +1,9 @@
-import ravop.core as R
 import numpy as np
-import matplotlib.pyplot as plt
-
+import ravop.core as R
 
 
 class LogisticRegression():
-    def __init__(self,lr=0.01, num_iter=10, fit_intercept=False, verbose=True):
+    def __init__(self, lr=0.01, num_iter=10, fit_intercept=False, verbose=True):
         self.lr = R.Scalar(lr)
         self.num_iter = num_iter
         self.fit_intercept = fit_intercept
@@ -15,7 +13,7 @@ class LogisticRegression():
         self.preds = None
 
     def __add_intercept(self, X):
-        self.x_shape1 = X.shape[1]+1
+        self.x_shape1 = X.shape[1] + 1
         intercept = np.ones((X.shape[0], 1))
         temp = np.concatenate((intercept, X), axis=1)
         return R.Tensor(temp)
@@ -33,14 +31,14 @@ class LogisticRegression():
     def fit(self, X, y):
         self.leny = len(y)
         Y = R.Tensor(y)
-        self.theta = R.Tensor([0]*np.shape(X)[1])
-        X=R.Tensor(X)
+        self.theta = R.Tensor([0] * np.shape(X)[1])
+        X = R.Tensor(X)
         for i in range(self.num_iter):
             h = self.__sigmoid(X.dot(self.theta))
             w = X.transpose()
             self.theta = self.theta.sub(self.lr.multiply((w.dot(h.sub(Y)).div(R.Scalar(self.leny)))))
             loss = self.__loss(self.__sigmoid(X.dot(self.theta)), Y)
-            print('Iteration : ',i)
+            print('Iteration : ', i)
 
     def predict_prob(self, X):
         if self.fit_intercept:
@@ -51,4 +49,3 @@ class LogisticRegression():
         p = self.predict_prob(R.t(X))
         p.persist_op(name="predicted_vals")
         return p
-
