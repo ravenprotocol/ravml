@@ -5,6 +5,8 @@ import ravop.core as R
 from ravop.core import Tensor, Scalar, square_root
 import numpy as np
 
+
+
 class KMeans():
     def __init__(self, **kwargs):
         self.params = kwargs
@@ -12,6 +14,47 @@ class KMeans():
         self._label = None
         self.centroids = None
         self.k = None
+
+    def fit(self, X, k=3, iter=10):
+        self._points = R.t(X)
+        self._rawpoints=X
+        self.k = k
+        self.centroids = self.initialize_centroids()
+        self._label = self.closest_centroids(self.centroids)
+        self.update_centroids()
+
+        for i in range(iter):
+            print('iteration', i)
+            
+            self._label = self.closest_centroids(self.centroids)
+            self.update_centroids()
+        self._label.persist_op(name="kmeans_label")
+        
+
+
+    def initialize_centroids(self):
+        return R.t(  self._rawpoints [np.random.choice(len(self._rawpoints), size=self.k)] )
+
+    def closest_centroids(self, centroids):
+        centroids = R.expand_dims(centroids, axis=1)
+        sub=R.sub(self._points, centroids).pow(R.t(2)).square_root()
+        temp=sub.sum(axis=2)
+        closest_centroids= R.argmin(temp.transpose() ,axis=1)
+        return closest_centroids
+
+    def update_centroids(self):
+        gather = self._points.gather(R.find_indices(self._label, R.t([0]))).transpose().mean(axis=1)
+        for i in range(1, self.k):
+            ind = R.find_indices(self._label, R.t([i]))
+            # print(ind())
+            gat = R.gather(self._points, ind).transpose().mean(axis=1)
+            gather = R.concat(gather, gat)
+        self.centroids = gather.reshape(shape=[self.k, len(self._rawpoints[0])])
+
+    def plot(self,label):
+        fig, axs = plt.subplots(1)
+        axs.scatter(self._rawpoints[:, 0], self._rawpoints[:, 1], c=label)
+        plt.show()
 
     def set_params(self, **kwargs):
         param_dict={
@@ -25,63 +68,6 @@ class KMeans():
                 param_dict[i]=kwargs[i]
 
         return param_dict
-
-        
-    def get_params(self):
-        param_dict={
-            'label': self._label(),
-            'points':self._points(),
-            'centroids':self._centroids(),
-            'k':self.k
-        }
-        return param_dict
-
-    def fit(self, X, k=3, iter=10):
-        self._points = R.t(X)
-        self.k = k
-        self.centroids = self.initialize_centroids()
-        print(self.centroids(),self._points())
-        self._label = self.closest_centroids(self.centroids)
-        self.update_centroids()
-
-        for i in range(iter):
-            print('iteration', i)
-            
-            self._label = self.closest_centroids(self.centroids)
-            self.update_centroids()
-            self._label()
-
-
-    def initialize_centroids(self):
-        return R.t(   self._points() [np.random.choice(len(self._points()), size=self.k)] )
-
-    def closest_centroids(self, centroids):
-        centroids = R.expand_dims(centroids, axis=1)
-        sub=R.sub(self._points, centroids).pow(R.t(2)).square_root()
-        
-        temp=sub.sum(axis=2)
-        
-        closest_centroids= R.argmin(temp.transpose() ,axis=1)
-        print("labels:\n",closest_centroids())
-        return closest_centroids
-
-    def update_centroids(self):
-        gather = self._points.gather(R.find_indices(self._label, R.t([0]))).transpose().mean(axis=1)
-        print("update 0:",gather())
-        # gather=R.t([])
-        for i in range(1, self.k):
-            ind = R.find_indices(self._label, R.t([i]))
-            # print(ind())
-            gat = R.gather(self._points, ind).transpose().mean(axis=1)
-            gather = R.concat(gather, gat)
-            print("update >>:",gather())
-        self.centroids = gather.reshape(shape=[self.k, len(self._points()[0])])
-        
-
-    def plot(self):
-        fig, axs = plt.subplots(1)
-        axs.scatter(self._points()[:, 0], self._points()[:, 1], c=self._label())
-        plt.show()
 
     @property
     def Points(self):

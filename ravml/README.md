@@ -1,6 +1,6 @@
 # Ravml Algorithms 
 
-You can implement the ravml algorithms in a graph by using importing Graph from ravop library .
+You can utilize the ravml algorithms in a graph by importing Graph from the ravop library .
 
 ```python
 import ravop.core as R

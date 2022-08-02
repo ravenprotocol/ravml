@@ -1,28 +1,41 @@
-from ravml.linear.linear_regression.linear_regression import LinearRegression
+from ravml.linear.linear_regression import LinearRegression
 import numpy as np
 import pathlib
-
+import ravop.core as R
 
 def preprocess(data):
     x = data[:,0]
     y = data[:,1]
     y = y.reshape(y.shape[0], 1)
-    x = np.c_[np.ones(x.shape[0]), x] # adding column of ones to X to account for theta_0 (the intercept)
+    x = np.c_[np.ones(x.shape[0]), x] 
     theta = np.zeros((2, 1))
     return x,y,theta
 
-iterations = 20
+R.initialize("<Ravauth Token>")
+R.flush()
+R.Graph(name='linreg', algorithm='linrig', approach='distributed')
+iterations = 5
 alpha = 0.01
-
-data = np.loadtxt('data_linreg.txt', delimiter=',')
+data = np.loadtxt('data/data_linreg.txt', delimiter=',')
 
 x,y,theta = preprocess(data)
 
-model = LinearRegression(x,y,theta)
-model.compute_cost()            # initial cost with coefficients at zero
-optimal_theta, inter, slope = model.gradient_descent(alpha, iterations)
-print(optimal_theta, inter, slope)
-res_file_path = str(pathlib.Path().resolve()) + '/result.png'
-print(res_file_path)
-model.plot_graph(optimal_theta, res_file_path)
 
+
+model = LinearRegression(x,y,theta)
+model.compute_cost()            
+theta= model.gradient_descent(alpha, iterations)
+model.predict(x)
+print(y)
+model.score(x,y)
+
+R.activate()
+
+R.execute()
+R.track_progress()
+optimal_theta = R.fetch_persisting_op(op_name="theta")
+pred = R.fetch_persisting_op(op_name="predicted values")
+print("optimized theta",optimal_theta)
+print("predicted values:",pred)
+# print(y)
+model.plot_graph(optimal_theta=optimal_theta)
